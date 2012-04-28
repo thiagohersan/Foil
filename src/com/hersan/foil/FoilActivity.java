@@ -13,6 +13,9 @@ import java.util.Calendar;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.HttpResponse;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.json.JSONObject;
@@ -77,7 +80,7 @@ public class FoilActivity extends TApplet {
 	private static final int SHAREDIALOG = 1;
 
 	// some state variables
-	private boolean showingDialog = false;
+	//private boolean showingDialog = false;
 
 	// text message. or leave blank for prompt
 	private String theStringMessage;// = "Is this too long enough for you! Answer me please! thank you!";
@@ -163,7 +166,6 @@ public class FoilActivity extends TApplet {
 					// save generated image to file
 					if((myMessage != null) && (toShow != null)) sendEmail(); //saveImage(); //
 					dismissDialog(SHAREDIALOG);
-					showingDialog = false;
 				}
 			});
 
@@ -188,7 +190,6 @@ public class FoilActivity extends TApplet {
 						}
 					}).start();
 					dismissDialog(SHAREDIALOG);
-					showingDialog = false;
 					Toast.makeText(FoilActivity.this, "Posting to Twitter....", Toast.LENGTH_SHORT ).show();
 				}
 			});
@@ -213,7 +214,6 @@ public class FoilActivity extends TApplet {
 						}
 					}).start();
 					dismissDialog(SHAREDIALOG);
-					showingDialog = false;
 					Toast.makeText(FoilActivity.this, "Posting on Facebook....", Toast.LENGTH_SHORT ).show();
 				}
 			});
@@ -271,7 +271,6 @@ public class FoilActivity extends TApplet {
 		// quit button. Just Quit!
 		shareButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				showingDialog = true;
 				showDialog(SHAREDIALOG);
 			}
 		});
@@ -436,15 +435,7 @@ public class FoilActivity extends TApplet {
 	 */
 	private void genImageFromText() {
 		// have valid string, create message
-		System.out.println("!!!!!: "+theStringMessage);
-		// turn off dialog 
-		// shouldn't happen anymore
-		/*
-		if(showingDialog == true){
-			dismissDialog(TEXTINPUTDIALOG);
-			showingDialog = false;
-		}
-		 */
+		System.out.println("!!!!! genImageFromText: "+theStringMessage);
 
 		// Message constructor should be able to deal with null or empty string for thePicturePath
 		myMessage = new Message(theStringMessage, this, INITW, INITH);
@@ -844,8 +835,15 @@ public class FoilActivity extends TApplet {
 		try{
 			// whoa. 1337.
 			//   get a new client to execute a get request with the uri
-			// TODO : change timeout of request
-			final HttpResponse myResponse = (new DefaultHttpClient()).execute(new HttpGet(uri));
+			// TODO : test request timeout
+
+			final HttpParams httpParameters = new BasicHttpParams();
+			// Set the timeout in milliseconds until a connection is established. In millis
+			HttpConnectionParams.setConnectionTimeout(httpParameters, 3000);
+			// Set the default socket timeout (SO_TIMEOUT) in millis
+			HttpConnectionParams.setSoTimeout(httpParameters, 3000);
+
+			final HttpResponse myResponse = (new DefaultHttpClient(httpParameters)).execute(new HttpGet(uri));
 			if(myResponse.getEntity() == null){
 				return false;
 			}

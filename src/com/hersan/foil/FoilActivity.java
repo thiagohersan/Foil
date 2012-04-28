@@ -74,6 +74,7 @@ public class FoilActivity extends TApplet {
 
 	// dialog ids
 	private static final int TEXTINPUTDIALOG = 0;
+	private static final int SHAREDIALOG = 1;
 
 	// some state variables
 	private boolean showingDialog = false;
@@ -83,8 +84,9 @@ public class FoilActivity extends TApplet {
 
 	// surface stuff
 	private ImageView imageSurface;
-	private Button regenButton, resetButton, quitButton;
-	private Button saveButton, tweetButton, faceButton;
+	private Button regenButton, saveButton, quitButton;
+	private Button emailButton, tweetButton, faceButton;
+	private Button backButton, shareButton;
 
 	// private of privates
 	private Message myMessage = null;
@@ -137,6 +139,89 @@ public class FoilActivity extends TApplet {
 
 			return alert.create();
 		}
+		////////
+		else if(id == SHAREDIALOG){
+			System.out.println("!!! from SHAREDIALOG");
+			final AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			// build view group dynamically
+			// from : http://developer.android.com/guide/topics/ui/dialogs.html#CustomDialog
+			final LayoutInflater inflater = (LayoutInflater) getApplicationContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+
+			final View vg = inflater.inflate(com.hersan.foil.R.layout.sharedialog,
+					(ViewGroup) findViewById(com.hersan.foil.R.id.share_root));
+
+			alert.setView(vg);
+
+			emailButton = (Button) vg.findViewById(com.hersan.foil.R.id.emailbutton);
+			tweetButton = (Button) vg.findViewById(com.hersan.foil.R.id.tweetbutton);
+			faceButton = (Button) vg.findViewById(com.hersan.foil.R.id.facebutton);
+
+			// email button : if image has been generated, email it.
+			emailButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					// save generated image to file
+					if((myMessage != null) && (toShow != null)) sendEmail(); //saveImage(); //
+					dismissDialog(SHAREDIALOG);
+					showingDialog = false;
+				}
+			});
+
+			// tweet button. Jesus...
+			//  using thread to get smooth click look
+			tweetButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					new Thread(new Runnable() {
+						public void run(){
+							// tested this on a network without internet
+							//     (works when internet is present, and when there's no network)
+							if(FoilActivity.checkConnectionTo("http://www.twitter.com") == true){
+								postToTwitter();
+							}
+							else{ 
+								runOnUiThread(new Runnable() {
+									public void run() { 
+										Toast.makeText(FoilActivity.this, "Couldn't connect to Twitter. Check internet connection", Toast.LENGTH_SHORT ).show();
+									}
+								});
+							}
+						}
+					}).start();
+					dismissDialog(SHAREDIALOG);
+					showingDialog = false;
+					Toast.makeText(FoilActivity.this, "Posting to Twitter....", Toast.LENGTH_SHORT ).show();
+				}
+			});
+
+			// facebook button
+			faceButton.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View v) {
+					new Thread(new Runnable() {
+						public void run(){
+							// tested this on a network without internet
+							//     (works when internet is present, and when there's no network)
+							if(FoilActivity.checkConnectionTo("http://www.facebook.com") == true){
+								postToFacebook();
+							}
+							else{ 
+								runOnUiThread(new Runnable() {
+									public void run() { 
+										Toast.makeText(FoilActivity.this, "Couldn't connect to Facebook. Check internet connection", Toast.LENGTH_SHORT ).show();
+									}
+								});
+							}
+						}
+					}).start();
+					dismissDialog(SHAREDIALOG);
+					showingDialog = false;
+					Toast.makeText(FoilActivity.this, "Posting on Facebook....", Toast.LENGTH_SHORT ).show();
+				}
+			});
+
+			// done creating dialog
+			return alert.create();
+		}
+
 		return null;
 	}
 
@@ -144,10 +229,13 @@ public class FoilActivity extends TApplet {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// DEBUG
-		System.out.println("!!!!!!: onCreate");
+		System.out.println("!!!!!!: Foil - onCreate");
 
 		// house-keeping
 		super.onCreate(savedInstanceState);
+
+		// get text message from input activity
+		theStringMessage = this.getIntent().getStringExtra("THE_STRING_MESSAGE");
 	}
 
 	/*
@@ -155,7 +243,7 @@ public class FoilActivity extends TApplet {
 	 */
 	private void onResumeCreateHelper(){
 		// DEBUG
-		System.out.println("!!!!!!: onResumeCreateHelper");
+		System.out.println("!!!!!!: Foil - onResumeCreateHelper");
 
 		setContentView(com.hersan.foil.R.layout.main);
 
@@ -163,18 +251,28 @@ public class FoilActivity extends TApplet {
 		imageSurface = (ImageView) findViewById(com.hersan.foil.R.id.textimageview);
 
 		// set up buttons!
-		saveButton = (Button) findViewById(com.hersan.foil.R.id.savebutton);
+		backButton = (Button) findViewById(com.hersan.foil.R.id.backbutton);
+		shareButton = (Button) findViewById(com.hersan.foil.R.id.sharebutton);
 		regenButton = (Button) findViewById(com.hersan.foil.R.id.regenbutton);
+		saveButton = (Button) findViewById(com.hersan.foil.R.id.savebutton);
 		quitButton = (Button) findViewById(com.hersan.foil.R.id.quitbutton);
-		resetButton = (Button) findViewById(com.hersan.foil.R.id.resetbutton);
-		tweetButton = (Button) findViewById(com.hersan.foil.R.id.tweetbutton);
-		faceButton = (Button) findViewById(com.hersan.foil.R.id.facebutton);
 
-		// save button : if image has been generated, save it.
-		saveButton.setOnClickListener(new View.OnClickListener() {
+		// quit button. Just Quit!
+		backButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// save generated image to file
-				if((myMessage != null) && (toShow != null)) sendEmail(); //sendEmail(); //saveImage();
+				// Set code for returning to input activity
+				Intent myIntent = new Intent(FoilActivity.this, FoilActivityInput.class);
+				myIntent.putExtra("THE_RESULT", FoilApplication.RESULT_BACK);
+				FoilActivity.this.startActivity(myIntent);
+				finish();
+			}
+		});
+
+		// quit button. Just Quit!
+		shareButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				showingDialog = true;
+				showDialog(SHAREDIALOG);
 			}
 		});
 
@@ -196,72 +294,29 @@ public class FoilActivity extends TApplet {
 						}
 					}).start();
 					Toast.makeText(FoilActivity.this, "Regenerating Image", Toast.LENGTH_SHORT ).show();
-					//genImageFromText();
 				}
 			}
 		});
 
-		// quit button. Just Quit!
+		// save button : if image has been generated, save it.
+		saveButton.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				// save generated image to file
+				if((myMessage != null) && (toShow != null)) saveImage(); //sendEmail();
+			}
+		});
+
+		// quit button. Return to other activity
 		quitButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
+				// Set quit code for returning to input activity
+				Intent myIntent = new Intent(FoilActivity.this, FoilActivityInput.class);
+				myIntent.putExtra("THE_RESULT", FoilApplication.RESULT_QUIT);
+				FoilActivity.this.startActivity(myIntent);
 				finish();
 			}
 		});
 
-		// reset button. Reset string, and Start Over!
-		resetButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				theStringMessage = "";
-				showingDialog = true;
-				showDialog(TEXTINPUTDIALOG);
-			}
-		});
-
-		// tweet button. Jesus...
-		//  using thread to get smooth click look
-		tweetButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run(){
-						// TODO: test this on a network without internet
-						//     (works when internet is present, and when there's no network)
-						if(FoilActivity.checkConnectionTo("http://www.twitter.com") == true){
-							postToTwitter();
-						}
-						else{ 
-							runOnUiThread(new Runnable() {
-								public void run() { 
-									Toast.makeText(FoilActivity.this, "Couldn't connect to Twitter. Check internet connection", Toast.LENGTH_SHORT ).show();
-								}
-							});
-						}
-					}
-				}).start();
-				Toast.makeText(FoilActivity.this, "Posting to Twitter....", Toast.LENGTH_SHORT ).show();
-			}
-		});
-
-		faceButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				new Thread(new Runnable() {
-					public void run(){
-						// TODO: test this on a network without internet
-						//     (works when internet is present, and when there's no network)
-						if(FoilActivity.checkConnectionTo("http://www.facebook.com") == true){
-							postToFacebook();
-						}
-						else{ 
-							runOnUiThread(new Runnable() {
-								public void run() { 
-									Toast.makeText(FoilActivity.this, "Couldn't connect to Facebook. Check internet connection", Toast.LENGTH_SHORT ).show();
-								}
-							});
-						}
-					}
-				}).start();
-				Toast.makeText(FoilActivity.this, "Posting on Facebook....", Toast.LENGTH_SHORT ).show();
-			}
-		});
 	}
 
 
@@ -271,7 +326,7 @@ public class FoilActivity extends TApplet {
 	@Override
 	public void onResume() {
 		// DEBUG
-		System.out.println("!!!!!: onResume");
+		System.out.println("!!!!!: Foil - onResume");
 
 		super.onResume();
 
@@ -283,15 +338,21 @@ public class FoilActivity extends TApplet {
 		}
 
 		// if message is not set, prompt user for message
+		//   this should never happen here...
 		if((theStringMessage == null) || (theStringMessage.equals(""))) {
-			showingDialog = true;
-			showDialog(TEXTINPUTDIALOG);
+			// Set error code and return to input activity
+			Intent myIntent = new Intent(FoilActivity.this, FoilActivityInput.class);
+			myIntent.putExtra("THE_RESULT", FoilApplication.RESULT_ERROR);
+			FoilActivity.this.startActivity(myIntent);
+			finish();
 		}
-		// onResume can happen a few times. Only do stuff if the message or image is not set
-		//   this handles case where message is set, but there's no image. 
-		//   should only happen in debugging, when the message is set up statically in the code
+
+		// onResume can happen a few times. Only do stuff if the message or image is not set.
+		//   This handles the case where message is set, but there's no image. 
+		//   Should only happen during first time this activity runs with a new theStringMessage
 		else if((myMessage == null) || (toShow == null)){			
-			genImageFromText();
+			this.genImageFromText();
+			this.showImageFromText();
 		}
 
 	}
@@ -309,7 +370,7 @@ public class FoilActivity extends TApplet {
 	@Override
 	public void onNewIntent(Intent intent) {
 		// DEBUG
-		System.out.println("!!!!!: onNewIntent");
+		System.out.println("!!!!!: Foil - onNewIntent");
 
 		Uri uri = intent.getData();
 
@@ -344,7 +405,7 @@ public class FoilActivity extends TApplet {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// DEBUG
-		System.out.println("!!!!!: onActivityResult");
+		System.out.println("!!!!!: Foil - onActivityResult");
 
 		super.onActivityResult(requestCode, resultCode, data);
 
@@ -359,32 +420,8 @@ public class FoilActivity extends TApplet {
 	@Override
 	public void onDestroy(){
 		// DEBUG
-		System.out.println("!!!!!: onDestroy!!!");
-
+		System.out.println("!!!!!: Foil - onDestroy !!!");
 		super.onDestroy();
-
-		FoilApplication myApp = (FoilApplication)getApplication();
-
-		// logout of twitter
-		if(myApp.ttTwitter != null){
-			// destroy twitter : I can't find a "logout" method -> manual logout
-			myApp.ttTwitter = null;
-			myApp.ttAccessToken = null;
-			myApp.ttRequestToken = null;
-		}
-		// logout of facebook
-		if(myApp.fbFacebook != null){
-			// if no async facebook, make a new instance
-			if(myApp.fbAsyncRunner == null){
-				myApp.fbAsyncRunner = new AsyncFacebookRunner(myApp.fbFacebook);
-			}
-			// should have an async runner here.
-			myApp.fbAsyncRunner.logout(this, new BaseRequestListener());
-			myApp.fbAsyncRunner = null;
-			myApp.fbFacebook = null;
-			myApp.fbAccessToken = null;
-			myApp.fbExpires = -1;
-		}
 	}
 
 	////////////////////////////
@@ -401,10 +438,13 @@ public class FoilActivity extends TApplet {
 		// have valid string, create message
 		System.out.println("!!!!!: "+theStringMessage);
 		// turn off dialog 
+		// shouldn't happen anymore
+		/*
 		if(showingDialog == true){
 			dismissDialog(TEXTINPUTDIALOG);
 			showingDialog = false;
 		}
+		 */
 
 		// Message constructor should be able to deal with null or empty string for thePicturePath
 		myMessage = new Message(theStringMessage, this, INITW, INITH);
@@ -487,7 +527,7 @@ public class FoilActivity extends TApplet {
 			outStream.flush();
 			outStream.close();
 			bm.recycle();
-			
+
 			// cache uri
 			imgUri = uri;
 		}
@@ -792,7 +832,7 @@ public class FoilActivity extends TApplet {
 		emailIntent.putExtra(android.content.Intent.EXTRA_STREAM, imgUri);
 		startActivity(Intent.createChooser(emailIntent, "Choose your email program: "));
 	}
-	
+
 	/*
 	 * Check connectivity to a given server.
 	 * Mostly to see if we can access twitter/facebook
@@ -803,7 +843,8 @@ public class FoilActivity extends TApplet {
 	static private boolean checkConnectionTo(String uri){
 		try{
 			// whoa. 1337.
-			//   get a new client to execute a get request with the uri  
+			//   get a new client to execute a get request with the uri
+			// TODO : change timeout of request
 			final HttpResponse myResponse = (new DefaultHttpClient()).execute(new HttpGet(uri));
 			if(myResponse.getEntity() == null){
 				return false;

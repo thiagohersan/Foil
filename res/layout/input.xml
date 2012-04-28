@@ -9,33 +9,40 @@
         android:layout_height="wrap_content"
         android:background="#3B5998" >
 
-        <!--
-        <Button
-            android:id="@+id/rsbutton"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/invisibleinputtittle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_column="0"
-            android:layout_marginBottom="@dimen/buttonPad"
-            android:layout_marginTop="@dimen/buttonPad"
-            android:text="Re-Gen" />
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="  Foil"
+            android:textColor="#3B5998"
+            android:textSize="36dp"
+            android:textStyle="bold"
+            android:typeface="normal" />
 
-        <Button
-            android:id="@+id/rbutton"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/inputtittle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_column="1"
-            android:layout_marginBottom="@dimen/buttonPad"
-            android:layout_marginTop="@dimen/buttonPad"
-            android:text="Reset" />
-        -->
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="  Foil"
+            android:textColor="#ffffff"
+            android:textSize="36dp"
+            android:textStyle="bold"
+            android:typeface="normal" />
 
         <Button
             android:id="@+id/nextbutton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_column="2"
             android:layout_marginBottom="@dimen/buttonPad"
             android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
             android:text="Next" />
     </TableRow>
 
@@ -48,6 +55,10 @@
             android:id="@+id/inputdialogtext"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
+            android:layout_marginBottom="@dimen/textBoxPad"
+            android:layout_marginLeft="@dimen/textBoxPad"
+            android:layout_marginRight="@dimen/textBoxPad"
+            android:layout_marginTop="@dimen/textBoxPad"
             android:layout_span="3"
             android:layout_weight="0.5"
             android:gravity="top"
@@ -62,33 +73,14 @@
         android:layout_height="wrap_content"
         android:background="#3B5998" >
 
-        <!--
-        <Button
-            android:id="@+id/sbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="0"
-            android:layout_marginBottom="@dimen/buttonPad"
-            android:layout_marginTop="@dimen/buttonPad"
-            android:text="Save" />
-
-        <Button
-            android:id="@+id/tbutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_column="1"
-            android:layout_marginBottom="@dimen/buttonPad"
-            android:layout_marginTop="@dimen/buttonPad"
-            android:text="Tweet" />
-        -->
-
         <Button
             android:id="@+id/inputquitbutton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_column="2"
             android:layout_marginBottom="@dimen/buttonPad"
             android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
             android:text="Quit" />
     </TableRow>
 

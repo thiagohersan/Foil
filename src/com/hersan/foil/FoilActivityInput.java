@@ -1,24 +1,16 @@
 package com.hersan.foil;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.Math;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,7 +23,7 @@ public class FoilActivityInput extends Activity {
 	///////////////
 	// constants and variables
 	////////////////
-
+	
 	// text message. or leave blank for prompt
 	private String theStringMessage;// = "Is this too long enough for you! Answer me please! thank you!";
 
@@ -49,10 +41,13 @@ public class FoilActivityInput extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// DEBUG
-		System.out.println("!!!!!!: onCreate");
+		System.out.println("!!!!!!: Input - onCreate");
 
 		// house-keeping
 		super.onCreate(savedInstanceState);
+		
+		// create buttons, etc, set content view
+		this.onResumeCreateHelper();
 	}
 
 	/*
@@ -60,7 +55,12 @@ public class FoilActivityInput extends Activity {
 	 */
 	private void onResumeCreateHelper(){
 		// DEBUG
-		System.out.println("!!!!!!: onResumeCreateHelper");
+		System.out.println("!!!!!!: Input - onResumeCreateHelper");
+		
+		// this should be in an xml, but this way it's consistent with the main FoilActivity
+	    // Take up as much area as possible
+	    requestWindowFeature(Window.FEATURE_NO_TITLE);
+
 
 		setContentView(com.hersan.foil.R.layout.input);
 
@@ -75,12 +75,10 @@ public class FoilActivityInput extends Activity {
 		nextButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				theStringMessage = textInput.getText().toString();
-				if(theStringMessage.equals("")){
-					finish();
-				}
-				else {
-					// TODO : start new activity here
-					//
+				if(!theStringMessage.equals("")){
+					Intent myIntent = new Intent(FoilActivityInput.this, FoilActivity.class);
+					myIntent.putExtra("THE_STRING_MESSAGE", theStringMessage);
+					FoilActivityInput.this.startActivity(myIntent);
 				}
 			}
 		});
@@ -100,26 +98,34 @@ public class FoilActivityInput extends Activity {
 	@Override
 	public void onResume() {
 		// DEBUG
-		System.out.println("!!!!!: onResume");
+		System.out.println("!!!!!: Input - onResume");
 
 		super.onResume();
 
 		// draws the buttons every time we resume
-		this.onResumeCreateHelper();
+		//this.onResumeCreateHelper();
 	}
 
-
-	/* Called when an activity you launched exits.
-	 * You will receive this call immediately before onResume() when your activity is re-starting.
-	 * 
-	 * Only used to set up the callback authorization from facebook instance
-	 * 
-	 */ 
+	/* Instead of a new instance of the activity being started, 
+	 * this is called on the existing instance with the Intent that was used to re-launch the activity.
+	 */
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// DEBUG
-		System.out.println("!!!!!: onActivityResult");
-		super.onActivityResult(requestCode, resultCode, data);
+	public void onNewIntent(Intent intent) {
+		// Check result. If quitting, call quit
+		if(intent.getIntExtra("THE_RESULT", 0) == FoilApplication.RESULT_ERROR){
+			// error in the Foil activity, quit
+			System.out.println("!!!!!: Input - onNewIntent = ERROR");
+			finish();
+		}
+		else if(intent.getIntExtra("THE_RESULT", 0) == FoilApplication.RESULT_QUIT){
+			// quitting the Foil activity, quit
+			System.out.println("!!!!!: Input - onNewIntent = QUIT");
+			finish();
+		}
+		else if(intent.getIntExtra("THE_RESULT", 0) == FoilApplication.RESULT_BACK){
+			// just getting back..... do nothing.
+			System.out.println("!!!!!: Input - onNewIntent = BACK");
+		}
 	}
 
 	/* Perform any final cleanup before an activity is destroyed. This gets called when someone 
@@ -128,8 +134,7 @@ public class FoilActivityInput extends Activity {
 	@Override
 	public void onDestroy(){
 		// DEBUG
-		System.out.println("!!!!!: onDestroy!!!");
-
+		System.out.println("!!!!!: Input - onDestroy !!!");
 		super.onDestroy();
 
 		FoilApplication myApp = (FoilApplication)getApplication();

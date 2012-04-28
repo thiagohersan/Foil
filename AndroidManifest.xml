@@ -15,11 +15,14 @@
             android:label="@string/app_name"
             android:launchMode="singleTask"
             android:name=".FoilActivity" >
+
+            <!--
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            -->
             <intent-filter >
                 <action android:name="android.intent.action.VIEW" />
 
@@ -29,6 +32,30 @@
                 <data android:scheme="callback" />
             </intent-filter>
         </activity>
+        <!--  -->
+        <activity
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/other_name"
+            android:launchMode="singleTask"
+            android:name=".FoilActivityInput" >
+            <intent-filter >
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!--
+                <intent-filter >
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="callback" />
+            </intent-filter>
+            -->
+        </activity>
+
+        <!--  -->
     </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />

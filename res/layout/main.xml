@@ -6,6 +6,99 @@
 
     <TableRow
         android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#3B5998" >
+
+        <Button
+            android:id="@+id/backbutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_marginBottom="@dimen/buttonPad"
+            android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
+            android:text="Back" />
+
+        <TextView
+            android:id="@+id/foiltittle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="  Foil"
+            android:textColor="#ffffff"
+            android:textSize="36dp"
+            android:textStyle="bold"
+            android:typeface="normal" />
+
+        <Button
+            android:id="@+id/sharebutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_marginBottom="@dimen/buttonPad"
+            android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
+            android:text="Share" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
+
+        <ImageView
+            android:id="@+id/textimageview"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_span="3" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#3B5998" >
+
+        <Button
+            android:id="@+id/regenbutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_marginBottom="@dimen/buttonPad"
+            android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
+            android:text="Refresh" />
+
+        <Button
+            android:id="@+id/savebutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_column="1"
+            android:layout_marginBottom="@dimen/buttonPad"
+            android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
+            android:text="Save" />
+
+        <Button
+            android:id="@+id/quitbutton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_marginBottom="@dimen/buttonPad"
+            android:layout_marginTop="@dimen/buttonPad"
+            android:layout_weight="1"
+            android:text="Quit" />
+    </TableRow>
+
+</TableLayout><!--
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:stretchColumns="*" >
+
+    <TableRow
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Button
@@ -69,3 +162,4 @@
     </TableRow>
 
 </TableLayout>
+-->

@@ -33,4 +33,8 @@ public class FoilApplication extends Application{
 	protected String fbAccessToken = null;
 	protected long fbExpires = -1;
 	
+	// for communicating between activities
+	protected static final int RESULT_ERROR = 234;
+	protected static final int RESULT_QUIT = 456;
+	protected static final int RESULT_BACK = 678;
 }

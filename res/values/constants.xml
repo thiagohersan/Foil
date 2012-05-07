@@ -5,7 +5,7 @@
     <string name="other_name">Foil</string>
 
     <dimen name="buttonPad">3dp</dimen>
-    <dimen name="textBoxPad">5dp</dimen>
+    <dimen name="textBoxPad">15dp</dimen>
     <dimen name="shareButtonPad">20dp</dimen>
     <dimen name="shareTablePad">30dp</dimen>
 

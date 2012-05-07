@@ -51,21 +51,36 @@
         android:layout_height="wrap_content"
         android:layout_weight="1" >
 
-        <EditText
-            android:id="@+id/inputdialogtext"
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_marginBottom="@dimen/textBoxPad"
-            android:layout_marginLeft="@dimen/textBoxPad"
-            android:layout_marginRight="@dimen/textBoxPad"
-            android:layout_marginTop="@dimen/textBoxPad"
+            android:layout_height="wrap_content"
             android:layout_span="3"
-            android:layout_weight="0.5"
-            android:gravity="top"
-            android:hint="Enter your text"
-            android:imeOptions="flagNoEnterAction"
-            android:inputType="textShortMessage|textMultiLine|textCapSentences|textAutoCorrect"
-            android:maxLength="140" />
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/inputsneakyimg"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/textBoxPad"
+                android:layout_marginRight="@dimen/textBoxPad"
+                android:layout_weight="0.3"
+                android:src="@drawable/sneaky" />
+
+            <EditText
+                android:id="@+id/inputdialogtext"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="@dimen/textBoxPad"
+                android:layout_marginRight="@dimen/textBoxPad"
+                android:layout_weight="0.3"
+                android:lines="4"
+                android:gravity="top"
+                android:hint="Enter your text"
+                android:imeOptions="flagNoEnterAction"
+                android:inputType="textShortMessage|textMultiLine|textCapSentences|textAutoCorrect"
+                android:maxLength="140" />
+        </LinearLayout>
     </TableRow>
 
     <TableRow

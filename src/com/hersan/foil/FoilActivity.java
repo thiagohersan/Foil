@@ -31,9 +31,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -154,7 +156,7 @@ public class FoilActivity extends TApplet {
 			final View vg = inflater.inflate(com.hersan.foil.R.layout.sharedialog,
 					(ViewGroup) findViewById(com.hersan.foil.R.id.share_root));
 
-			alert.setView(vg);
+			//alert.setView(vg,20,0,20,0);
 
 			emailButton = (Button) vg.findViewById(com.hersan.foil.R.id.emailbutton);
 			tweetButton = (Button) vg.findViewById(com.hersan.foil.R.id.tweetbutton);
@@ -219,7 +221,12 @@ public class FoilActivity extends TApplet {
 			});
 
 			// done creating dialog
-			return alert.create();
+			AlertDialog ad = alert.create();
+			ad.setView(vg,0,0,0,0);
+			ad.setTitle("Share : ");
+			ad.getWindow().setGravity(Gravity.TOP);
+			return ad;
+			//return alert.create();
 		}
 
 		return null;
@@ -705,7 +712,8 @@ public class FoilActivity extends TApplet {
 								//break;
 							}
 							// secret wall album for posting to friends' wall
-							else if((jObj.getString("type").equalsIgnoreCase("friends_walls"))&&(false)){
+							//  ***right now this code is turned off***
+							else if((jObj.getString("type").equalsIgnoreCase("friends_walls"))&&(i>dataArr.length())){
 								// TODO: friend picker dialog
 								System.out.println("!!! found friends_walls");
 								String wallID = jObj.getString("id");
@@ -716,25 +724,13 @@ public class FoilActivity extends TApplet {
 
 								// add to friend wall
 								myApp.fbAsyncRunner.request(wallID+"/photos", friendBundle, "POST", new BaseRequestListener(){
-									// Turning this off.
 									// Use onComplete here to POST a Post request to a friend's wall
-									//@Override
-									public void onComplete__(final String response, final Object state) { 
+									@Override
+									public void onComplete(final String response, final Object state) { 
 										try {
 											JSONObject jObj = Util.parseJson(response);
 											final String myPhotoID = jObj.getString("id");
-											myApp.fbAsyncRunner.request(myPhotoID, new Bundle(), "GET", new BaseRequestListener(){
-												@Override
-												public void onComplete(final String response, final Object state) { 
-													try{
-														System.out.println("!!! from photo GET: "+myPhotoID);
-														JSONObject jObj = Util.parseJson(response);
-														final String myPhotoLink = jObj.getString("link");
-														FoilActivity.this.postToFriendsFacebook(myPhotoID);
-													}
-													catch(Exception e){}
-												}
-											}, null);
+											FoilActivity.this.postToFriendsFacebook(myPhotoID);
 										}
 										catch(Exception e){}
 									}
@@ -759,6 +755,7 @@ public class FoilActivity extends TApplet {
 		}
 	}
 
+	// given a photoID, use it on a post in friend's feed
 	private void postToFriendsFacebook(final String photoID){
 		final FoilApplication myApp = (FoilApplication)getApplication();
 		myApp.fbAsyncRunner.request("me/friends", new Bundle(), "GET", new BaseRequestListener(){
@@ -834,15 +831,15 @@ public class FoilActivity extends TApplet {
 	static private boolean checkConnectionTo(String uri){
 		try{
 			// whoa. 1337.
-			//   get a new client to execute a get request with the uri
-			// TODO : test request timeout
 
+			// set timeout parameters for an http connection
 			final HttpParams httpParameters = new BasicHttpParams();
 			// Set the timeout in milliseconds until a connection is established. In millis
-			HttpConnectionParams.setConnectionTimeout(httpParameters, 3000);
+			HttpConnectionParams.setConnectionTimeout(httpParameters, 4000);
 			// Set the default socket timeout (SO_TIMEOUT) in millis
-			HttpConnectionParams.setSoTimeout(httpParameters, 3000);
+			HttpConnectionParams.setSoTimeout(httpParameters, 4000);
 
+			//   get a new client to execute a get request with the uri
 			final HttpResponse myResponse = (new DefaultHttpClient(httpParameters)).execute(new HttpGet(uri));
 			if(myResponse.getEntity() == null){
 				return false;
